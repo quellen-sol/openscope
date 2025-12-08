@@ -191,6 +191,12 @@
         "premium": false
     },
     {
+        "icao": "kcos",
+        "level": "easy",
+        "name": "Colorado Springs Municipal Airport",
+        "premium": false
+    },
+    {
         "icao": "kdca",
         "level": "easy",
         "name": "Ronald Reagan Washington National Airport",

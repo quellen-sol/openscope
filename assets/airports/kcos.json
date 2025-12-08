@@ -1,0 +1,289 @@
+{
+    "radio": {
+        "twr": "Springs Tower",
+        "app": "Springs Approach",
+        "dep": "Springs Departure"
+    },
+    "icao": "KCOS",
+    "iata": "COS",
+    "magnetic_north": 7.32,
+    "ctr_radius": 80,
+    "ctr_ceiling": 16000,
+    "intial_alt": 10000,
+    "position": ["N38d48m18.0", "W104d42m0", "6187ft"],
+    "rangeRings": {
+        "enabled": true,
+        "center": ["N38d48m18.0", "W104d42m0"],
+        "radius_nm": 5.0
+    },
+    "has_terrain": false,
+    "wind": {
+        "angle": 350,
+        "speed": 5
+    },
+    "arrivalRunway": "35R",
+    "departureRunway": "35L",
+    "defaultMaps": ["Base Map"],
+    "airspace": [
+        {
+            "floor": 0,
+            "ceiling": 160,
+            "airspace_class": "C",
+            "poly": [
+                [39.196667, -104.2525],
+                [39.1025, -104.206389],
+                [38.85, -104.083333],
+                [38.600833, -104.053611],
+                [38.499167, -104.045556],
+                [38.498611, -104.075278],
+                [38.483333, -104.25],
+                [38.4375, -104.816667],
+                [38.435556, -104.958889],
+                [38.443889, -105.004444],
+                [38.541111, -104.986944],
+                [38.704444, -104.95],
+                [38.9775, -105.054167],
+                [39.128889, -105.085],
+                [39.113056, -104.866667],
+                [39.104444, -104.774444],
+                [39.168333, -104.701667],
+                [39.169167, -104.328611],
+                [39.196667, -104.2525]
+            ]
+        }
+    ],
+    "fixes": {
+        "HBU": ["N38d27m07.619", "W107d02m22.971"],
+        "ALS": ["N37d20m56.972", "W105d48m55.918"],
+        "TBE": ["N37d15m31.167", "W103d36m00.201"],
+        "BRK": ["N38d56m40.237", "W104d38m00.482"],
+        "GLD": ["N39d23m16.324", "W101d41m32.268"],
+        "HGO": ["N38d49m03.000", "W103d37m17.000"],
+        "LAA": ["N38d11m49.531", "W102d41m15.116"],
+        "PUB": ["N38d17m39.313", "W104d25m46.011"],
+        "FLOOD": ["N38d20m24.010", "W105d05m38.380"],
+        "TRPEL": ["N37d58m50.480", "W104d53m45.680"],
+        "OPSHN": ["N38d08m45.000", "W104d39m04.070"],
+        "FSHER": ["N38d18m34.880", "W104d38m51.140"],
+        "GLITR": ["N39d15m34.880", "W102d08m08.960"],
+        "CREWW": ["N39d05m01.800", "W102d44m06.130"],
+        "DOHRS": ["N38d59m48.380", "W103d01m05.660"],
+        "TULLL": ["N38d19m39.000", "W102d52m54.000"],
+        "HYMNS": ["N38d32m56.900", "W103d12m50.570"],
+        "OZZZY": ["N38d52m05.000", "W104d01m21.000"],
+        "ADANE": ["N38d54m57.260", "W104d23m56.460"],
+        "LUFSE": ["N39d12m49.580", "W104d23m03.640"],
+        "JEWLS": ["N38d31m58.390", "W103d49m54.690"],
+        "DRAKE": ["N38d36m24.050", "W104d24m51.180"],
+        "MIDAY": ["N38d34m16.160", "W104d42m58.240"],
+        "FALUR": ["N38d34m05.000", "W104d41m10.180"],
+        "CEGIX": ["N38d40m38.280", "W104d41m09.520"],
+        "BYEBI": ["N39d05m30.540", "W104d23m33.160"]
+    },
+    "runways": [
+        {
+            "name": ["17L", "35R"],
+            "name_offset": [
+                [0, 0],
+                [0, 0]
+            ],
+            "end": [
+                ["N38d48m57.9128", "W104d41m08.6413", "6187ft"],
+                ["N38d46m44.5113", "W104d41m08.8716", "6187ft"]
+            ],
+            "ils": [true, true]
+        },
+        {
+            "name": ["17R", "35L"],
+            "name_offset": [
+                [0, 0],
+                [0, 0]
+            ],
+            "end": [
+                ["N38d49m26.6712", "W104d42m57.2208", "6187ft"],
+                ["N38d47m37.7681", "W104d42m57.3628", "6187ft"]
+            ],
+            "ils": [false, true]
+        },
+        {
+            "name": ["13", "31"],
+            "name_offset": [
+                [0, 0],
+                [0, 0]
+            ],
+            "end": [
+                ["N38d49m23.3607", "W104d42m55.2768", "6187ft"],
+                ["N38d48m25.4944", "W104d41m41.5314", "6187ft"]
+            ],
+            "ils": [false, false]
+        }
+    ],
+    "sids": {
+        "COS6": {
+            "icao": "COS6",
+            "name": "Springs Six",
+            "rwy": {
+                "KCOS17L": ["#150"],
+                "KCOS17R": ["#172"],
+                "KCOS35L": ["#352"],
+                "KCOS35R": ["#010"]
+            },
+            "body": [],
+            "exitPoints": {
+                "ADANE": ["ADANE"],
+                "DRAKE": ["DRAKE"],
+                "BRK": ["BRK"],
+                "JEWLS": ["JEWLS"],
+                "HGO": ["HGO"],
+                "LAA": ["LAA"]
+            },
+            "draw": [
+                ["ADANE*"],
+                ["DRAKE*"],
+                ["BRK*"],
+                ["JEWLS*"],
+                ["HGO*"],
+                ["LAA*"]
+            ]
+        }
+    },
+    "stars": {
+        "DBRY5": {
+            "icao": "DBRY5",
+            "name": "Deberry Five",
+            "entryPoints": {
+                "HBU": ["HBU", "FLOOD"],
+                "ALS": ["ALS", "TRPEL", "OPSHN"],
+                "TBE": ["TBE", "OPSHN"]
+            },
+            "body": [["FSHER", "S250-"], "BRK"],
+            "rwy": {
+                "KCOS17L": [],
+                "KCOS17R": [],
+                "KCOS35L": [],
+                "KCOS35R": []
+            },
+            "draw": [
+                ["HBU*", "FLOOD", "FSHER", "BRK"],
+                ["ALS", "TRPEL", "OPSHN", "FSHER", "BRK"],
+                ["TBE", "OPSHN", "FSHER", "BRK"]
+            ]
+        },
+        "OZZZY5": {
+            "icao": "OZZZY5",
+            "name": "Ozzzy Five",
+            "entryPoints": {
+                "GLD": [
+                    "GLD",
+                    ["GLITR", "A280"],
+                    ["CREWW", "A270"],
+                    ["DOHRS", "A230"]
+                ],
+                "LAA": [
+                    ["LAA", "A280"],
+                    ["TULLL", "A270"],
+                    ["HYMNS", "A230"]
+                ]
+            },
+            "body": [["HGO", "A170"], ["OZZZY", "A140|S250"], "ADANE"],
+            "rwy": {
+                "KCOS17L": [],
+                "KCOS17R": [],
+                "KCOS35L": [],
+                "KCOS35R": []
+            },
+            "draw": [
+                ["GLD", "GLITR", "CREWW", "DOHRS", "HGO", "OZZZY", "ADANE"],
+                ["LAA", "TULLL", "HYMNS", "HGO", "OZZZY", "ADANE"]
+            ]
+        }
+    },
+    "spawnPatterns": [
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35R.COS6.ADANE..LUFSE",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["ual", 3],
+                ["swa", 2],
+                ["skw", 2],
+                ["n/fastGA", 20]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35R.COS6.DRAKE..PUB..HBU",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["ual", 3],
+                ["swa", 2],
+                ["skw", 2],
+                ["n/fastGA", 20]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35R.COS6.BRK..JEWLS..LAA",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["ual", 3],
+                ["swa", 2],
+                ["skw", 2],
+                ["n/fastGA", 20]
+            ]
+        },
+        {
+            "origin": "",
+            "destination": "KCOS",
+            "category": "arrival",
+            "route": "LAA.OZZZY5.KCOS17L",
+            "altitude": 28000,
+            "speed": 320,
+            "method": "random",
+            "rate": 5,
+            "airlines": [
+                ["ual", 3],
+                ["swa", 2],
+                ["skw", 2],
+                ["n/fastGA", 20]
+            ]
+        },
+        {
+            "origin": "",
+            "destination": "KCOS",
+            "category": "arrival",
+            "route": "LUFSE..ADANE..KCOS17L",
+            "altitude": 28000,
+            "speed": 320,
+            "method": "random",
+            "rate": 5,
+            "airlines": [
+                ["ual", 3],
+                ["swa", 2],
+                ["skw", 2],
+                ["n/fastGA", 20]
+            ]
+        }
+    ],
+    "maps": [
+        {
+            "name": "Base Map",
+            "lines": [["N38d48m18.0", "W104d42m0", "N38d48m18.0", "W104d42m0"]]
+        }
+    ]
+}
