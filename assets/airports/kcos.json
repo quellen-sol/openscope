@@ -9,7 +9,7 @@
     "magnetic_north": 7.32,
     "ctr_radius": 80,
     "ctr_ceiling": 16000,
-    "intial_alt": 10000,
+    "initial_alt": 10000,
     "position": ["N38d48m18.0", "W104d42m0", "6187ft"],
     "rangeRings": {
         "enabled": true,
@@ -78,7 +78,8 @@
         "MIDAY": ["N38d34m16.160", "W104d42m58.240"],
         "FALUR": ["N38d34m05.000", "W104d41m10.180"],
         "CEGIX": ["N38d40m38.280", "W104d41m09.520"],
-        "BYEBI": ["N39d05m30.540", "W104d23m33.160"]
+        "BYEBI": ["N39d05m30.540", "W104d23m33.160"],
+        "BRESH": ["N38d18m24.320", "W104d07m42.800"]
     },
     "runways": [
         {
@@ -118,6 +119,9 @@
             "ils": [false, false]
         }
     ],
+    "airways": {
+        "V389": ["LUFSE", "ADANE", "DRAKE", "PUB"]
+    },
     "sids": {
         "COS6": {
             "icao": "COS6",
@@ -209,74 +213,246 @@
             "method": "random",
             "rate": 1,
             "airlines": [
-                ["ual", 3],
+                ["aal", 1],
+                ["dal", 2],
                 ["swa", 2],
                 ["skw", 2],
-                ["n/fastGA", 20]
+                ["ual", 3],
+                ["n/fastGA", 10]
             ]
         },
         {
             "origin": "KCOS",
             "destination": "",
             "category": "departure",
-            "route": "KCOS35R.COS6.DRAKE..PUB..HBU",
+            "route": "KCOS35L.COS6.ADANE..LUFSE",
             "altitude": "",
             "speed": "",
             "method": "random",
             "rate": 1,
             "airlines": [
-                ["ual", 3],
+                ["aal", 1],
+                ["dal", 2],
                 ["swa", 2],
                 ["skw", 2],
-                ["n/fastGA", 20]
+                ["ual", 3],
+                ["n/fastGA", 10]
             ]
         },
         {
             "origin": "KCOS",
             "destination": "",
             "category": "departure",
-            "route": "KCOS35R.COS6.BRK..JEWLS..LAA",
+            "route": "KCOS35R.COS6.DRAKE..PUB",
             "altitude": "",
             "speed": "",
             "method": "random",
             "rate": 1,
             "airlines": [
-                ["ual", 3],
+                ["aal", 1],
+                ["dal", 2],
                 ["swa", 2],
                 ["skw", 2],
-                ["n/fastGA", 20]
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35L.COS6.DRAKE..PUB",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35R.COS6.BRK..JEWLS",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35L.COS6.BRK..JEWLS",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35R.COS6.JEWLS..HGO",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "KCOS",
+            "destination": "",
+            "category": "departure",
+            "route": "KCOS35R.COS6.BRK..BRESH",
+            "altitude": "",
+            "speed": "",
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
             ]
         },
         {
             "origin": "",
             "destination": "KCOS",
             "category": "arrival",
-            "route": "LAA.OZZZY5.KCOS17L",
-            "altitude": 28000,
-            "speed": 320,
+            "route": "LUFSE..ADANE..BRK",
+            "altitude": 11000,
+            "speed": 280,
             "method": "random",
-            "rate": 5,
+            "rate": 1,
             "airlines": [
-                ["ual", 3],
+                ["aal", 1],
+                ["dal", 2],
                 ["swa", 2],
                 ["skw", 2],
-                ["n/fastGA", 20]
+                ["ual", 3],
+                ["n/fastGA", 10]
             ]
         },
         {
             "origin": "",
             "destination": "KCOS",
             "category": "arrival",
-            "route": "LUFSE..ADANE..KCOS17L",
+            "route": "LAA.OZZZY5.KCOS35R",
             "altitude": 28000,
-            "speed": 320,
+            "speed": 250,
             "method": "random",
-            "rate": 5,
+            "rate": 1,
             "airlines": [
-                ["ual", 3],
+                ["aal", 1],
+                ["dal", 2],
                 ["swa", 2],
                 ["skw", 2],
-                ["n/fastGA", 20]
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "",
+            "destination": "KCOS",
+            "category": "arrival",
+            "route": "GLD.OZZZY5.KCOS35R",
+            "altitude": 28000,
+            "speed": 250,
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "",
+            "destination": "KCOS",
+            "category": "arrival",
+            "route": "HBU.DBRY5.KCOS35R",
+            "altitude": 10000,
+            "speed": 250,
+            "method": "random",
+            "rate": 1,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "",
+            "destination": "KCOS",
+            "category": "arrival",
+            "route": "ALS.DBRY5.KCOS35R",
+            "altitude": 10000,
+            "speed": 250,
+            "method": "random",
+            "rate": 0.5,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
+            ]
+        },
+        {
+            "origin": "",
+            "destination": "KCOS",
+            "category": "arrival",
+            "route": "TBE.DBRY5.KCOS35R",
+            "altitude": 10000,
+            "speed": 250,
+            "method": "random",
+            "rate": 0.5,
+            "airlines": [
+                ["aal", 1],
+                ["dal", 2],
+                ["swa", 2],
+                ["skw", 2],
+                ["ual", 3],
+                ["n/fastGA", 10]
             ]
         }
     ],
