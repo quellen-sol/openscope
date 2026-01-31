@@ -84,6 +84,16 @@ export default class Pilot {
          */
         this.hasDepartureClearance = false;
 
+        /**
+         * Whether the pilot has reported the field (airport) in sight
+         *
+         * @for Pilot
+         * @property hasFieldInSight
+         * @type {boolean}
+         * @default false
+         */
+        this.hasFieldInSight = false;
+
         return this.init(fms, modeController);
     }
 
@@ -97,6 +107,7 @@ export default class Pilot {
         this._mcp = modeController;
         this.hasApproachClearance = false;
         this.hasDepartureClearance = false;
+        this.hasFieldInSight = false;
 
         return this;
     }
@@ -111,6 +122,7 @@ export default class Pilot {
         this._mcp = null;
         this.hasApproachClearance = false;
         this.hasDepartureClearance = false;
+        this.hasFieldInSight = false;
 
         return this;
     }
@@ -807,6 +819,88 @@ export default class Pilot {
         const readback = {};
         readback.log = `cleared ${approachType.toUpperCase()} runway ${runwayModel.name} approach`;
         readback.say = `cleared ${approachType.toUpperCase()} runway ${radio_runway(runwayModel.name)} approach`;
+
+        return [true, readback];
+    }
+
+    /**
+     * Report whether the field (airport) is in sight
+     *
+     * The pilot can see the field when within approximately 10-15nm.
+     * We use 12nm as the threshold for visibility.
+     *
+     * @for Pilot
+     * @method reportFieldInSight
+     * @param aircraftModel {AircraftModel} the aircraft model belonging to this pilot
+     * @param airportModel {AirportModel}   the airport to check visibility for
+     * @return {array}                      [success of operation, readback]
+     */
+    reportFieldInSight(aircraftModel, airportModel) {
+        const FIELD_IN_SIGHT_DISTANCE_NM = 12;
+        const distanceToAirport = aircraftModel.positionModel.distanceToPosition(airportModel.positionModel);
+        const readback = {};
+
+        if (distanceToAirport <= FIELD_IN_SIGHT_DISTANCE_NM) {
+            this.hasFieldInSight = true;
+            readback.log = 'field in sight';
+            readback.say = 'field in sight';
+
+            return [true, readback];
+        }
+
+        this.hasFieldInSight = false;
+        readback.log = 'negative, field not in sight';
+        readback.say = 'negative, field not in sight';
+
+        return [true, readback];
+    }
+
+    /**
+     * Conduct a visual approach to a runway
+     *
+     * The pilot must have reported the field in sight before being cleared
+     * for a visual approach. The aircraft will fly toward the runway and
+     * descend at pilot discretion.
+     *
+     * @for Pilot
+     * @method conductVisualApproach
+     * @param aircraftModel {AircraftModel} the aircraft model belonging to this pilot
+     * @param runwayModel {RunwayModel}     the runway to approach
+     * @return {array}                      [success of operation, readback]
+     */
+    conductVisualApproach(aircraftModel, runwayModel) {
+        if (_isNil(runwayModel)) {
+            return [false, 'the specified runway does not exist'];
+        }
+
+        if (!this.hasFieldInSight) {
+            const readback = {};
+            readback.log = 'unable visual approach, field not in sight';
+            readback.say = 'unable visual approach, field not in sight';
+
+            return [false, readback];
+        }
+
+        // Set up lateral guidance toward the runway
+        const datum = runwayModel.positionModel;
+        const course = runwayModel.angle;
+
+        this._mcp.setNav1Datum(datum);
+        this._mcp.setCourseFieldValue(course);
+        this._mcp.setHeadingVorLoc();
+
+        // For visual approach, use a standard 3 degree descent angle
+        const descentAngle = 3;
+        this._mcp.setDescentAngle(descentAngle);
+        this._mcp.setAltitudeApproach();
+
+        this.cancelHoldingPattern();
+        this._fms.setArrivalRunway(runwayModel);
+        this.hasApproachClearance = true;
+
+        const readback = {};
+        readback.log = `cleared visual approach runway ${runwayModel.name}`;
+        readback.say = `cleared visual approach runway ${radio_runway(runwayModel.name)}`;
 
         return [true, readback];
     }

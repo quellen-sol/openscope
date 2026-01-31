@@ -114,6 +114,16 @@ export const AIRCRAFT_COMMAND_MAP = {
         functionName: 'runIls',
         isSystemCommand: false
     },
+    reportFieldInSight: {
+        aliases: ['rfs'],
+        functionName: 'runReportFieldInSight',
+        isSystemCommand: false
+    },
+    visual: {
+        aliases: ['v', 'visual'],
+        functionName: 'runVisualApproach',
+        isSystemCommand: false
+    },
     land: {
         aliases: ['land'],
         functionName: 'runLand',

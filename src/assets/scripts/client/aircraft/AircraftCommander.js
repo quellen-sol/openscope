@@ -754,6 +754,34 @@ export default class AircraftCommander {
     }
 
     /**
+     * Ask the pilot if they have the field (airport) in sight
+     *
+     * @for AircraftCommander
+     * @method runReportFieldInSight
+     * @param aircraft {AircraftModel}
+     * @return {array}   [success of operation, readback]
+     */
+    runReportFieldInSight(aircraft) {
+        return aircraft.pilot.reportFieldInSight(aircraft, AirportController.airport_get());
+    }
+
+    /**
+     * Clear the aircraft for a visual approach to a runway
+     *
+     * @for AircraftCommander
+     * @method runVisualApproach
+     * @param aircraft {AircraftModel}
+     * @param data {array}
+     * @return {array}   [success of operation, readback]
+     */
+    runVisualApproach(aircraft, data) {
+        const runwayName = data[1].toUpperCase();
+        const runwayModel = AirportController.airport_get().getRunway(runwayName);
+
+        return aircraft.pilot.conductVisualApproach(aircraft, runwayModel);
+    }
+
+    /**
      * @for AircraftCommander
      * @method runLand
      * @param aircraft {AircraftModel}
