@@ -40,12 +40,16 @@ export default class Pilot {
      */
     constructor(fms, modeController) {
         if (!(fms instanceof Fms)) {
-            throw new TypeError(`Expected fms to an instance of Fms but received ${typeof fms}`);
+            throw new TypeError(
+                `Expected fms to an instance of Fms but received ${typeof fms}`,
+            );
         }
 
         if (!(modeController instanceof ModeController)) {
-            throw new TypeError('Expected modeController to an instance of ' +
-                `ModeController, but received ${typeof modeController}`);
+            throw new TypeError(
+                'Expected modeController to an instance of ' +
+                    `ModeController, but received ${typeof modeController}`,
+            );
         }
 
         /**
@@ -94,6 +98,16 @@ export default class Pilot {
          */
         this.hasFieldInSight = false;
 
+        /**
+         * Current traffic pattern state for visual approaches
+         *
+         * @for Pilot
+         * @property _patternState
+         * @type {object|null}
+         * @private
+         */
+        this._patternState = null;
+
         return this.init(fms, modeController);
     }
 
@@ -108,6 +122,7 @@ export default class Pilot {
         this.hasApproachClearance = false;
         this.hasDepartureClearance = false;
         this.hasFieldInSight = false;
+        this._patternState = null;
 
         return this;
     }
@@ -139,17 +154,30 @@ export default class Pilot {
      * @param aircraftModel {AircraftModel}
      * @return {array} [success of operation, readback]
      */
-    maintainAltitude(altitude, expedite, shouldUseSoftCeiling, airportModel, aircraftModel) {
-        const response = aircraftModel.validateNextAltitude(altitude, airportModel);
+    maintainAltitude(
+        altitude,
+        expedite,
+        shouldUseSoftCeiling,
+        airportModel,
+        aircraftModel,
+    ) {
+        const response = aircraftModel.validateNextAltitude(
+            altitude,
+            airportModel,
+        );
 
         if (!response[0]) {
             return response;
         }
 
         const currentAltitude = aircraftModel.altitude;
-        let clampedAltitude = airportModel.clampWithinAssignableAltitudes(altitude);
+        let clampedAltitude =
+            airportModel.clampWithinAssignableAltitudes(altitude);
 
-        if (shouldUseSoftCeiling && clampedAltitude === airportModel.maxAssignableAltitude) {
+        if (
+            shouldUseSoftCeiling &&
+            clampedAltitude === airportModel.maxAssignableAltitude
+        ) {
             // causes aircraft to 'leave' airspace, and continue climb through ceiling
             clampedAltitude += 1;
         }
@@ -161,7 +189,11 @@ export default class Pilot {
 
         // Build readback
         const readbackAltitude = _floor(clampedAltitude, -2);
-        const altitudeInstruction = radio_trend('altitude', currentAltitude, altitude);
+        const altitudeInstruction = radio_trend(
+            'altitude',
+            currentAltitude,
+            altitude,
+        );
         const altitudeVerbal = radio_altitude(readbackAltitude);
         let expediteReadback = '';
 
@@ -197,10 +229,14 @@ export default class Pilot {
 
         if (incremental) {
             // if direction is left
-            correctedHeading = radians_normalize(aircraftModel.heading - nextHeadingInRadians);
+            correctedHeading = radians_normalize(
+                aircraftModel.heading - nextHeadingInRadians,
+            );
 
             if (direction === 'right') {
-                correctedHeading = radians_normalize(aircraftModel.heading + nextHeadingInRadians);
+                correctedHeading = radians_normalize(
+                    aircraftModel.heading + nextHeadingInRadians,
+                );
             }
         }
 
@@ -239,9 +275,11 @@ export default class Pilot {
         this._mcp.setHeadingHold();
 
         const readback = {};
-        const runwayOrPresent = (
-            aircraftModel.flightPhase === FLIGHT_PHASE.WAITING || aircraftModel.flightPhase === FLIGHT_PHASE.TAKEOFF
-        ) ? 'runway' : 'present';
+        const runwayOrPresent =
+            aircraftModel.flightPhase === FLIGHT_PHASE.WAITING ||
+            aircraftModel.flightPhase === FLIGHT_PHASE.TAKEOFF ?
+                'runway' :
+                'present';
         readback.log = `fly ${runwayOrPresent} heading`;
         readback.say = `fly ${runwayOrPresent} heading`;
 
@@ -291,7 +329,8 @@ export default class Pilot {
      * @return {array}                   [success of operation, readback]
      */
     applyArrivalProcedure(routeString, airportName) {
-        const [successful, response] = this._fms.replaceArrivalProcedure(routeString);
+        const [successful, response] =
+            this._fms.replaceArrivalProcedure(routeString);
 
         if (!successful) {
             return [false, response];
@@ -318,7 +357,10 @@ export default class Pilot {
      * @return {array}                      [success of operation, readback]
      */
     applyDepartureProcedure(routeString, airportIcao) {
-        const [successful, response] = this._fms.replaceDepartureProcedure(routeString, airportIcao);
+        const [successful, response] = this._fms.replaceDepartureProcedure(
+            routeString,
+            airportIcao,
+        );
 
         if (!successful) {
             return [false, response];
@@ -367,7 +409,10 @@ export default class Pilot {
      */
     updateStarLegForArrivalRunway(aircraft, nextRunwayModel) {
         if (aircraft.isOnGround()) {
-            return [false, 'unable to accept arrival runway assignment until airborne'];
+            return [
+                false,
+                'unable to accept arrival runway assignment until airborne'
+            ];
         }
 
         return this._fms.updateStarLegForArrivalRunway(nextRunwayModel);
@@ -392,7 +437,10 @@ export default class Pilot {
         const airport = AirportController.airport_get();
         const currentAltitude = _floor(aircraftModel.altitude, -2);
         const descentAltitude = Math.min(currentAltitude, this._mcp.altitude);
-        const altitudeToMaintain = Math.max(descentAltitude, airport.minAssignableAltitude);
+        const altitudeToMaintain = Math.max(
+            descentAltitude,
+            airport.minAssignableAltitude,
+        );
 
         this._mcp.setAltitudeFieldValue(altitudeToMaintain);
         this._mcp.setAltitudeHold();
@@ -401,8 +449,10 @@ export default class Pilot {
         this._mcp.setSpeedHold();
 
         this.hasApproachClearance = false;
+        this._patternState = null;
 
-        const readback = 'cancel approach clearance, fly present heading, ' +
+        const readback =
+            'cancel approach clearance, fly present heading, ' +
             'maintain last assigned altitude and speed';
 
         return [true, readback];
@@ -423,41 +473,56 @@ export default class Pilot {
 
         this.hasDepartureClearance = false;
 
-        return [true, 'roger, understand IFR clearance is cancelled, standing by'];
+        return [
+            true,
+            'roger, understand IFR clearance is cancelled, standing by'
+        ];
     }
 
     /**
-    * Arm the exit of the holding pattern
-    *
-    * @for Pilot
-    * @method cancelHoldingPattern
-    * @param fixName {string} name of the fix at which the hold should be canceled (optional)
-    * @return {array} [success of operation, readback]
-    */
+     * Arm the exit of the holding pattern
+     *
+     * @for Pilot
+     * @method cancelHoldingPattern
+     * @param fixName {string} name of the fix at which the hold should be canceled (optional)
+     * @return {array} [success of operation, readback]
+     */
     cancelHoldingPattern(fixName) {
-        let holdWaypointModel = _find(this._fms.waypoints, (waypointModel) => waypointModel.isHoldWaypoint);
+        let holdWaypointModel = _find(
+            this._fms.waypoints,
+            (waypointModel) => waypointModel.isHoldWaypoint,
+        );
 
         if (!holdWaypointModel) {
-            return [false, 'that must be for somebody else, we weren\'t given any holding instructions'];
+            return [
+                false,
+                "that must be for somebody else, we weren't given any holding instructions"
+            ];
         }
 
         if (fixName) {
             holdWaypointModel = this._fms.findWaypoint(fixName);
 
             if (!holdWaypointModel || !holdWaypointModel.isHoldWaypoint) {
-                return [false, {
-                    log: `that must be for somebody else, we weren't given holding over ${fixName.toUpperCase()}`,
-                    say: `that must be for somebody else, we weren't given holding over ${NavigationLibrary.getFixSpokenName(fixName)}`
-                }];
+                return [
+                    false,
+                    {
+                        log: `that must be for somebody else, we weren't given holding over ${fixName.toUpperCase()}`,
+                        say: `that must be for somebody else, we weren't given holding over ${NavigationLibrary.getFixSpokenName(fixName)}`
+                    }
+                ];
             }
         }
 
         holdWaypointModel.deactivateHold();
 
-        return [true, {
-            log: `roger, we'll cancel the hold at ${holdWaypointModel.getDisplayName()}`,
-            say: `roger, we'll cancel the hold at ${NavigationLibrary.getFixSpokenName(holdWaypointModel.name)}`
-        }];
+        return [
+            true,
+            {
+                log: `roger, we'll cancel the hold at ${holdWaypointModel.getDisplayName()}`,
+                say: `roger, we'll cancel the hold at ${NavigationLibrary.getFixSpokenName(holdWaypointModel.name)}`
+            }
+        ];
     }
 
     /**
@@ -494,19 +559,22 @@ export default class Pilot {
     climbViaSid(aircraftModel, maximumAltitude) {
         let nextAltitude = maximumAltitude;
 
-
         if (typeof nextAltitude === 'undefined') {
             nextAltitude = this._fms.flightPlanAltitude;
         }
 
         const { departureAirportModel } = this._fms;
-        const altitudeCheck = aircraftModel.validateNextAltitude(nextAltitude, departureAirportModel);
+        const altitudeCheck = aircraftModel.validateNextAltitude(
+            nextAltitude,
+            departureAirportModel,
+        );
 
         if (!altitudeCheck[0]) {
             return altitudeCheck;
         }
 
-        nextAltitude = departureAirportModel.clampWithinAssignableAltitudes(nextAltitude);
+        nextAltitude =
+            departureAirportModel.clampWithinAssignableAltitudes(nextAltitude);
 
         if (aircraftModel.altitude > nextAltitude) {
             const currentAltitude = _ceil(aircraftModel.altitude, -2);
@@ -549,13 +617,17 @@ export default class Pilot {
         }
 
         const { arrivalAirportModel } = this._fms;
-        const altitudeCheck = aircraftModel.validateNextAltitude(nextAltitude, arrivalAirportModel);
+        const altitudeCheck = aircraftModel.validateNextAltitude(
+            nextAltitude,
+            arrivalAirportModel,
+        );
 
         if (!altitudeCheck[0]) {
             return altitudeCheck;
         }
 
-        nextAltitude = arrivalAirportModel.clampWithinAssignableAltitudes(nextAltitude);
+        nextAltitude =
+            arrivalAirportModel.clampWithinAssignableAltitudes(nextAltitude);
 
         if (aircraftModel.altitude < nextAltitude) {
             const currentAltitude = _ceil(aircraftModel.altitude, -2);
@@ -590,7 +662,10 @@ export default class Pilot {
      */
     crossFix(aircraftModel, fixName, altitude, speed) {
         if (!altitude && !speed) {
-            return [false, 'say again? In crossing restrictions, prefix altitudes with A and speeds with S!'];
+            return [
+                false,
+                'say again? In crossing restrictions, prefix altitudes with A and speeds with S!'
+            ];
         }
 
         if (!NavigationLibrary.hasFixName(fixName)) {
@@ -609,12 +684,16 @@ export default class Pilot {
             return [false, readback];
         }
 
-        const airportModel = this._fms.arrivalAirportModel || this._fms.departureAirportModel;
+        const airportModel =
+            this._fms.arrivalAirportModel || this._fms.departureAirportModel;
         const waypoint = this._fms.findWaypoint(fixName);
 
         // altitude-only crossing restriction
         if (!speed) {
-            const altitudeCheck = aircraftModel.validateNextAltitude(altitude, airportModel);
+            const altitudeCheck = aircraftModel.validateNextAltitude(
+                altitude,
+                airportModel,
+            );
 
             if (!altitudeCheck[0]) {
                 return altitudeCheck;
@@ -655,7 +734,10 @@ export default class Pilot {
         }
 
         // altitude AND speed crossing restriction
-        const altitudeCheck = aircraftModel.validateNextAltitude(altitude, airportModel);
+        const altitudeCheck = aircraftModel.validateNextAltitude(
+            altitude,
+            airportModel,
+        );
         const speedCheck = aircraftModel.validateNextSpeed(speed);
 
         if (!altitudeCheck[0]) {
@@ -745,7 +827,10 @@ export default class Pilot {
         // TODO: I feel like our description of lateral/vertical guidance should be done with its
         // own class rather than like this by storing all sorts of irrelevant stuff in the pilot/MCP.
         if (this._mcp.nav1Datum !== datum) {
-            return [false, 'cannot follow glidepath because we are using lateral navigation from a different origin'];
+            return [
+                false,
+                'cannot follow glidepath because we are using lateral navigation from a different origin'
+            ];
         }
 
         if (this._mcp.course !== course) {
@@ -783,14 +868,17 @@ export default class Pilot {
             return [false, 'the specified runway does not exist'];
         }
 
-        const minimumGlideslopeInterceptAltitude = runwayModel.getMinimumGlideslopeInterceptAltitude();
+        const minimumGlideslopeInterceptAltitude =
+            runwayModel.getMinimumGlideslopeInterceptAltitude();
 
         if (aircraftModel.mcp.altitude < minimumGlideslopeInterceptAltitude) {
             const readback = {};
 
-            readback.log = `unable ILS ${runwayModel.name}, our assigned altitude is below the minimum ` +
+            readback.log =
+                `unable ILS ${runwayModel.name}, our assigned altitude is below the minimum ` +
                 `glideslope intercept altitude, request climb to ${minimumGlideslopeInterceptAltitude}`;
-            readback.say = `unable ILS ${radio_runway(runwayModel.name)}, our assigned altitude is below the minimum ` +
+            readback.say =
+                `unable ILS ${radio_runway(runwayModel.name)}, our assigned altitude is below the minimum ` +
                 `glideslope intercept altitude, request climb to ${radio_altitude(minimumGlideslopeInterceptAltitude)}`;
 
             return [false, readback];
@@ -801,7 +889,11 @@ export default class Pilot {
         const course = runwayModel.angle;
         const descentAngle = runwayModel.ils.glideslopeGradient;
         const lateralGuidance = this._interceptCourse(datum, course);
-        const verticalGuidance = this._interceptGlidepath(datum, course, descentAngle);
+        const verticalGuidance = this._interceptGlidepath(
+            datum,
+            course,
+            descentAngle,
+        );
 
         // TODO: As written, `._interceptCourse()` will always return true.
         if (!lateralGuidance[0]) {
@@ -837,7 +929,10 @@ export default class Pilot {
      */
     reportFieldInSight(aircraftModel, airportModel) {
         const FIELD_IN_SIGHT_DISTANCE_NM = 12;
-        const distanceToAirport = aircraftModel.positionModel.distanceToPosition(airportModel.positionModel);
+        const distanceToAirport =
+            aircraftModel.positionModel.distanceToPosition(
+                airportModel.positionModel,
+            );
         const readback = {};
 
         if (distanceToAirport <= FIELD_IN_SIGHT_DISTANCE_NM) {
@@ -881,28 +976,276 @@ export default class Pilot {
             return [false, readback];
         }
 
-        // Set up lateral guidance toward the runway
-        const datum = runwayModel.positionModel;
         const course = runwayModel.angle;
+        const PATTERN_RADIUS_NM = 1.5;
 
-        this._mcp.setNav1Datum(datum);
-        this._mcp.setCourseFieldValue(course);
-        this._mcp.setHeadingVorLoc();
+        // Determine pattern entry and traffic direction
+        const patternLeg = this._determinePatternEntry(
+            aircraftModel,
+            runwayModel,
+        );
+        const isLeftTraffic = this._determineTrafficDirection(
+            aircraftModel,
+            runwayModel,
+        );
 
-        // For visual approach, use a standard 3 degree descent angle
-        const descentAngle = 3;
-        this._mcp.setDescentAngle(descentAngle);
-        this._mcp.setAltitudeApproach();
+        // For final/straight-in, use VOR_LOC intercept
+        if (patternLeg === 'final') {
+            this._mcp.setNav1Datum(runwayModel.positionModel);
+            this._mcp.setCourseFieldValue(course);
+            this._mcp.setHeadingVorLoc();
+            this._patternState = null;
+        } else {
+            // Set up pattern state for flying the box pattern
+            // isIntercepting = true means we're still flying toward the pattern leg
+            this._patternState = {
+                runwayModel: runwayModel,
+                currentLeg: patternLeg,
+                isLeftTraffic: isLeftTraffic,
+                patternRadius: PATTERN_RADIUS_NM,
+                isIntercepting: true
+            };
+
+            // Calculate 45° intercept heading to the pattern leg
+            const legHeading = this._getPatternLegHeading(
+                course,
+                patternLeg,
+                isLeftTraffic,
+            );
+            const turnDir = isLeftTraffic ? -1 : 1;
+            // Intercept angle: turn TOWARD the pattern (opposite of turn direction in pattern)
+            const interceptHeading = radians_normalize(
+                legHeading - degreesToRadians(45) * turnDir,
+            );
+
+            this._mcp.setHeadingFieldValue(interceptHeading);
+            this._mcp.setHeadingHold();
+
+            // Set up nav datum for eventual final turn
+            this._mcp.setNav1Datum(runwayModel.positionModel);
+            this._mcp.setCourseFieldValue(course);
+        }
+
+        // Pilot descends at their discretion to runway elevation
+        this._mcp.setAltitudeFieldValue(runwayModel.elevation);
+        this._mcp.setAltitudeHold();
 
         this.cancelHoldingPattern();
         this._fms.setArrivalRunway(runwayModel);
         this.hasApproachClearance = true;
 
+        const trafficDir = isLeftTraffic ? 'left' : 'right';
+        const patternInfo =
+            patternLeg === 'final' ? '' : `, enter ${trafficDir} ${patternLeg}`;
         const readback = {};
-        readback.log = `cleared visual approach runway ${runwayModel.name}`;
-        readback.say = `cleared visual approach runway ${radio_runway(runwayModel.name)}`;
+        readback.log = `cleared visual approach runway ${runwayModel.name}${patternInfo}`;
+        readback.say = `cleared visual approach runway ${radio_runway(runwayModel.name)}${patternInfo}`;
 
         return [true, readback];
+    }
+
+    /**
+     * Update traffic pattern progress during visual approach.
+     * Called from AircraftModel update loop to check if it's time to turn to next leg.
+     *
+     * @for Pilot
+     * @method updatePatternProgress
+     * @param aircraftModel {AircraftModel}
+     */
+    updatePatternProgress(aircraftModel) {
+        if (!this._patternState) {
+            return;
+        }
+
+        const {
+            runwayModel,
+            currentLeg,
+            isLeftTraffic,
+            patternRadius,
+            isIntercepting
+        } = this._patternState;
+        const runwayPos = runwayModel.positionModel;
+        const course = runwayModel.angle;
+        const turnDir = isLeftTraffic ? -1 : 1;
+        const HALF_PI = Math.PI / 2;
+
+        const distanceToRunway =
+            aircraftModel.positionModel.distanceToPosition(runwayPos);
+        const bearingFromRunway = runwayPos.bearingToPosition(
+            aircraftModel.positionModel,
+        );
+        const angleOffCourse = radians_normalize(bearingFromRunway - course);
+        const lateralOffset = Math.abs(
+            Math.sin(angleOffCourse) * distanceToRunway,
+        );
+        const alongTrackDist = Math.cos(angleOffCourse) * distanceToRunway;
+
+        // Handle interception phase - aircraft is flying toward the pattern leg
+        if (isIntercepting) {
+            const legHeading = this._getPatternLegHeading(
+                course,
+                currentLeg,
+                isLeftTraffic,
+            );
+
+            if (currentLeg === 'downwind') {
+                // Intercept downwind when we reach the pattern width (lateralOffset ~= patternRadius)
+                // and we're roughly abeam or ahead of the runway
+                if (
+                    lateralOffset >= patternRadius * 0.9 &&
+                    alongTrackDist > -patternRadius
+                ) {
+                    this._patternState.isIntercepting = false;
+                    this._mcp.setHeadingFieldValue(legHeading);
+                }
+            } else if (currentLeg === 'base') {
+                // Intercept base when we're at appropriate distance ahead and offset
+                if (
+                    alongTrackDist > patternRadius * 0.5 &&
+                    alongTrackDist < patternRadius * 2
+                ) {
+                    this._patternState.isIntercepting = false;
+                    this._mcp.setHeadingFieldValue(legHeading);
+                }
+            }
+            return;
+        }
+
+        // Handle pattern leg transitions (already established on leg)
+        switch (currentLeg) {
+            case 'downwind': {
+                // Turn to base when past the runway threshold by pattern radius distance
+                if (
+                    alongTrackDist < 0 &&
+                    Math.abs(alongTrackDist) >= patternRadius * 0.8
+                ) {
+                    this._patternState.currentLeg = 'base';
+                    const baseHeading = radians_normalize(
+                        course + Math.PI + turnDir * HALF_PI,
+                    );
+                    this._mcp.setHeadingFieldValue(baseHeading);
+                }
+                break;
+            }
+            case 'base': {
+                // Turn to final when close to the extended centerline
+                if (lateralOffset <= 0.5) {
+                    this._patternState.currentLeg = 'final';
+                    this._mcp.setHeadingVorLoc();
+                    this._patternState = null;
+                }
+                break;
+            }
+            case 'crosswind': {
+                // Turn to downwind when we've reached pattern width
+                if (lateralOffset >= patternRadius * 0.8) {
+                    this._patternState.currentLeg = 'downwind';
+                    const downwindHeading = radians_normalize(course + Math.PI);
+                    this._mcp.setHeadingFieldValue(downwindHeading);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Determine left or right traffic based on aircraft position relative to runway centerline.
+     * Aircraft LEFT of the extended centerline → LEFT traffic (counterclockwise pattern)
+     * Aircraft RIGHT of the extended centerline → RIGHT traffic (clockwise pattern)
+     * @private
+     * @returns {boolean} true for left traffic, false for right traffic
+     */
+    _determineTrafficDirection(aircraftModel, runwayModel) {
+        const runwayPos = runwayModel.positionModel;
+        const course = runwayModel.angle;
+        const bearingFromRunway = runwayPos.bearingToPosition(
+            aircraftModel.positionModel,
+        );
+        const crossTrackAngle = radians_normalize(bearingFromRunway - course);
+        // sin < 0 means aircraft is to the LEFT of centerline → left traffic
+        // sin > 0 means aircraft is to the RIGHT of centerline → right traffic
+        return Math.sin(crossTrackAngle) < 0;
+    }
+
+    /**
+     * Determine which pattern leg to enter based on aircraft position relative to runway.
+     * Uses along-track and cross-track distances to determine optimal entry point.
+     * @private
+     * @returns {string} 'final', 'base', or 'downwind'
+     */
+    _determinePatternEntry(aircraftModel, runwayModel) {
+        const runwayPos = runwayModel.positionModel;
+        const course = runwayModel.angle;
+        const distanceToRunway =
+            aircraftModel.positionModel.distanceToPosition(runwayPos);
+        const bearingFromRunway = runwayPos.bearingToPosition(
+            aircraftModel.positionModel,
+        );
+
+        // Calculate along-track and cross-track distances
+        const angleOffCourse = radians_normalize(bearingFromRunway - course);
+        // alongTrack: positive = ahead of runway threshold, negative = behind
+        const alongTrack = Math.cos(angleOffCourse) * distanceToRunway;
+        // crossTrack: absolute lateral distance from extended centerline
+        const crossTrack = Math.abs(
+            Math.sin(angleOffCourse) * distanceToRunway,
+        );
+
+        const PATTERN_RADIUS = 1.5; // nm
+
+        // If very close to centerline and well ahead of runway → straight-in final
+        if (crossTrack < 0.5 && alongTrack > PATTERN_RADIUS * 2) {
+            return 'final';
+        }
+
+        // If reasonably close to centerline (< ~2nm) and ahead → enter base
+        // This gives a short base leg to turn final
+        if (
+            crossTrack < PATTERN_RADIUS * 1.5 &&
+            alongTrack > PATTERN_RADIUS * 0.5
+        ) {
+            return 'base';
+        }
+
+        // Otherwise, enter downwind - aircraft will fly the full pattern
+        return 'downwind';
+    }
+
+    /**
+     * Get heading for a pattern leg
+     * @private
+     * @param {number} runwayHeading - Runway heading in radians
+     * @param {string} patternLeg - 'final', 'upwind', 'crosswind', 'downwind', or 'base'
+     * @param {boolean} isLeftTraffic - true for left traffic pattern
+     * @returns {number} Heading in radians for the specified leg
+     */
+    _getPatternLegHeading(runwayHeading, patternLeg, isLeftTraffic = true) {
+        const turnDir = isLeftTraffic ? -1 : 1;
+        const HALF_PI = Math.PI / 2;
+
+        switch (patternLeg) {
+            case 'final':
+            case 'upwind':
+                return runwayHeading;
+            case 'crosswind':
+                // Crosswind is 90° turn from runway heading
+                // Left traffic: turn left (-90°), Right traffic: turn right (+90°)
+                return radians_normalize(runwayHeading + turnDir * HALF_PI);
+            case 'downwind':
+                // Downwind is opposite of runway heading (always 180°)
+                return radians_normalize(runwayHeading + Math.PI);
+            case 'base':
+                // Base is 90° turn from downwind toward the runway
+                // Left traffic: downwind + left turn = runway + 180 - 90 = runway + 90
+                // Right traffic: downwind + right turn = runway + 180 + 90 = runway + 270
+                return radians_normalize(
+                    runwayHeading + Math.PI + turnDir * HALF_PI,
+                );
+            default:
+                return runwayHeading;
+        }
     }
 
     // TODO: Add ability to hold at present position
@@ -917,7 +1260,11 @@ export default class Pilot {
      * @return {array} [success of operation, readback]
      */
     initiateHoldingPattern(fixName, holdParameters, fallbackInboundHeading) {
-        const [success, responseValue] = this._fms.activateHoldForWaypointName(fixName, holdParameters, fallbackInboundHeading);
+        const [success, responseValue] = this._fms.activateHoldForWaypointName(
+            fixName,
+            holdParameters,
+            fallbackInboundHeading,
+        );
 
         if (!success) {
             return [success, responseValue];
@@ -928,17 +1275,25 @@ export default class Pilot {
         // the `WaypointModel`s _holdParameters property
         holdParameters = responseValue;
 
-        const radialText = heading_to_string(holdParameters.inboundHeading + Math.PI);
-        const cardinalDirectionFromFix = getRadioCardinalDirectionNameForHeading(holdParameters.inboundHeading);
+        const radialText = heading_to_string(
+            holdParameters.inboundHeading + Math.PI,
+        );
+        const cardinalDirectionFromFix =
+            getRadioCardinalDirectionNameForHeading(
+                holdParameters.inboundHeading,
+            );
         const holdParametersReadback = `${holdParameters.turnDirection} turns, ${holdParameters.legLength} legs`;
         const radialReadbackLog = `on the ${radialText} radial`;
         const radialReadbackSay = `on the ${radio_heading(radialText)} radial`;
 
         // force lower-case in verbal readback to get speech synthesis to pronounce the fix instead of spelling it
-        return [true, {
-            log: `hold ${cardinalDirectionFromFix} of ${fixName.toUpperCase()} ${radialReadbackLog}, ${holdParametersReadback}`,
-            say: `hold ${cardinalDirectionFromFix} of ${NavigationLibrary.getFixSpokenName(fixName)} ${radialReadbackSay}, ${holdParametersReadback}`
-        }];
+        return [
+            true,
+            {
+                log: `hold ${cardinalDirectionFromFix} of ${fixName.toUpperCase()} ${radialReadbackLog}, ${holdParametersReadback}`,
+                say: `hold ${cardinalDirectionFromFix} of ${NavigationLibrary.getFixSpokenName(fixName)} ${radialReadbackSay}, ${holdParametersReadback}`
+            }
+        ];
     }
 
     /**
@@ -1078,7 +1433,11 @@ export default class Pilot {
             case MCP_MODE.HEADING.LNAV: {
                 const waypoint = this._fms.currentWaypoint;
                 const waypointPosition = waypoint.positionModel;
-                const bearing = Math.round(radiansToDegrees(this.positionModel.bearingToPosition(waypointPosition)));
+                const bearing = Math.round(
+                    radiansToDegrees(
+                        this.positionModel.bearingToPosition(waypointPosition),
+                    ),
+                );
 
                 readback.log = `our on-course heading to ${waypoint.getDisplayName()} is ${bearing}`;
                 readback.say = `our on-course heading to ${NavigationLibrary.getFixSpokenName(waypoint.getDisplayName())} is ${radio_heading(bearing)}`;
@@ -1087,8 +1446,8 @@ export default class Pilot {
             }
 
             default:
-                readback.log = 'we haven\'t been assigned a heading';
-                readback.say = 'we haven\'t been assigned a heading';
+                readback.log = "we haven't been assigned a heading";
+                readback.say = "we haven't been assigned a heading";
 
                 return [true, readback];
         }
