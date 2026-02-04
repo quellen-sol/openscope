@@ -1185,31 +1185,48 @@ export default class Pilot {
         );
 
         // Calculate along-track and cross-track distances
+        // angleOffCourse: angle between runway course and bearing to aircraft
         const angleOffCourse = radians_normalize(bearingFromRunway - course);
-        // alongTrack: positive = ahead of runway threshold, negative = behind
+        // alongTrack: positive = aircraft is AHEAD of runway (approaching from in front)
+        //             negative = aircraft is BEHIND runway (on the approach side)
         const alongTrack = Math.cos(angleOffCourse) * distanceToRunway;
         // crossTrack: absolute lateral distance from extended centerline
         const crossTrack = Math.abs(
             Math.sin(angleOffCourse) * distanceToRunway,
         );
 
-        const PATTERN_RADIUS = 1.5; // nm
+        const PATTERN_RADIUS = 1.5; // nm - standard pattern width
+        const FINAL_APPROACH_MAX_OFFSET = 0.5; // nm - max lateral offset for straight-in
+        const MIN_FINAL_DISTANCE = 2.0; // nm - minimum distance ahead for straight-in final
 
-        // If very close to centerline and well ahead of runway → straight-in final
-        if (crossTrack < 0.5 && alongTrack > PATTERN_RADIUS * 2) {
+        // Aircraft position cases:
+        // alongTrack > 0: Aircraft is AHEAD of runway (in front of threshold, e.g., departing end)
+        // alongTrack < 0: Aircraft is BEHIND runway (approaching end, normal for arrivals)
+
+        // Case 1: Straight-in final
+        // Aircraft is behind the runway (alongTrack < 0), close to centerline, 
+        // and at a reasonable distance for final approach
+        if (crossTrack < FINAL_APPROACH_MAX_OFFSET && alongTrack < -MIN_FINAL_DISTANCE) {
             return 'final';
         }
 
-        // If reasonably close to centerline (< ~2nm) and ahead → enter base
-        // This gives a short base leg to turn final
+        // Case 2: Enter base leg
+        // Aircraft is behind the runway, offset from centerline but not too far,
+        // positioned to make a base-to-final turn
         if (
-            crossTrack < PATTERN_RADIUS * 1.5 &&
-            alongTrack > PATTERN_RADIUS * 0.5
+            crossTrack >= FINAL_APPROACH_MAX_OFFSET &&
+            crossTrack < PATTERN_RADIUS * 2 &&
+            alongTrack < -PATTERN_RADIUS * 0.5 &&
+            alongTrack > -PATTERN_RADIUS * 4
         ) {
             return 'base';
         }
 
-        // Otherwise, enter downwind - aircraft will fly the full pattern
+        // Case 3: Enter downwind
+        // Aircraft is either:
+        // - Ahead of the runway (alongTrack > 0), needs to fly pattern
+        // - Behind but too far offset for base entry
+        // - Too close to runway for base entry
         return 'downwind';
     }
 
